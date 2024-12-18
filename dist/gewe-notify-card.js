@@ -1,266 +1,6 @@
 (function () {
   'use strict';
 
-  function _arrayLikeToArray(r, a) {
-    (null == a || a > r.length) && (a = r.length);
-    for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
-    return n;
-  }
-  function _arrayWithHoles(r) {
-    if (Array.isArray(r)) return r;
-  }
-  function _decorate(e, r, t, i) {
-    var o = _getDecoratorsApi();
-    var s = r(function (e) {
-        o.initializeInstanceElements(e, a.elements);
-      }, t),
-      a = o.decorateClass(_coalesceClassElements(s.d.map(_createElementDescriptor)), e);
-    return o.initializeClassElements(s.F, a.elements), o.runClassFinishers(s.F, a.finishers);
-  }
-  function _getDecoratorsApi() {
-    _getDecoratorsApi = function () {
-      return e;
-    };
-    var e = {
-      elementsDefinitionOrder: [["method"], ["field"]],
-      initializeInstanceElements: function (e, r) {
-        ["method", "field"].forEach(function (t) {
-          r.forEach(function (r) {
-            r.kind === t && "own" === r.placement && this.defineClassElement(e, r);
-          }, this);
-        }, this);
-      },
-      initializeClassElements: function (e, r) {
-        var t = e.prototype;
-        ["method", "field"].forEach(function (i) {
-          r.forEach(function (r) {
-            var o = r.placement;
-            if (r.kind === i && ("static" === o || "prototype" === o)) {
-              var n = "static" === o ? e : t;
-              this.defineClassElement(n, r);
-            }
-          }, this);
-        }, this);
-      },
-      defineClassElement: function (e, r) {
-        var t = r.descriptor;
-        if ("field" === r.kind) {
-          var i = r.initializer;
-          t = {
-            enumerable: t.enumerable,
-            writable: t.writable,
-            configurable: t.configurable,
-            value: void 0 === i ? void 0 : i.call(e)
-          };
-        }
-        Object.defineProperty(e, r.key, t);
-      },
-      decorateClass: function (e, r) {
-        var t = [],
-          i = [],
-          o = {
-            static: [],
-            prototype: [],
-            own: []
-          };
-        if (e.forEach(function (e) {
-          this.addElementPlacement(e, o);
-        }, this), e.forEach(function (e) {
-          if (!_hasDecorators(e)) return t.push(e);
-          var r = this.decorateElement(e, o);
-          t.push(r.element), t.push.apply(t, r.extras), i.push.apply(i, r.finishers);
-        }, this), !r) return {
-          elements: t,
-          finishers: i
-        };
-        var n = this.decorateConstructor(t, r);
-        return i.push.apply(i, n.finishers), n.finishers = i, n;
-      },
-      addElementPlacement: function (e, r, t) {
-        var i = r[e.placement];
-        if (!t && -1 !== i.indexOf(e.key)) throw new TypeError("Duplicated element (" + e.key + ")");
-        i.push(e.key);
-      },
-      decorateElement: function (e, r) {
-        for (var t = [], i = [], o = e.decorators, n = o.length - 1; n >= 0; n--) {
-          var s = r[e.placement];
-          s.splice(s.indexOf(e.key), 1);
-          var a = this.fromElementDescriptor(e),
-            l = this.toElementFinisherExtras((0, o[n])(a) || a);
-          e = l.element, this.addElementPlacement(e, r), l.finisher && i.push(l.finisher);
-          var c = l.extras;
-          if (c) {
-            for (var p = 0; p < c.length; p++) this.addElementPlacement(c[p], r);
-            t.push.apply(t, c);
-          }
-        }
-        return {
-          element: e,
-          finishers: i,
-          extras: t
-        };
-      },
-      decorateConstructor: function (e, r) {
-        for (var t = [], i = r.length - 1; i >= 0; i--) {
-          var o = this.fromClassDescriptor(e),
-            n = this.toClassDescriptor((0, r[i])(o) || o);
-          if (void 0 !== n.finisher && t.push(n.finisher), void 0 !== n.elements) {
-            e = n.elements;
-            for (var s = 0; s < e.length - 1; s++) for (var a = s + 1; a < e.length; a++) if (e[s].key === e[a].key && e[s].placement === e[a].placement) throw new TypeError("Duplicated element (" + e[s].key + ")");
-          }
-        }
-        return {
-          elements: e,
-          finishers: t
-        };
-      },
-      fromElementDescriptor: function (e) {
-        var r = {
-          kind: e.kind,
-          key: e.key,
-          placement: e.placement,
-          descriptor: e.descriptor
-        };
-        return Object.defineProperty(r, Symbol.toStringTag, {
-          value: "Descriptor",
-          configurable: !0
-        }), "field" === e.kind && (r.initializer = e.initializer), r;
-      },
-      toElementDescriptors: function (e) {
-        if (void 0 !== e) return _toArray(e).map(function (e) {
-          var r = this.toElementDescriptor(e);
-          return this.disallowProperty(e, "finisher", "An element descriptor"), this.disallowProperty(e, "extras", "An element descriptor"), r;
-        }, this);
-      },
-      toElementDescriptor: function (e) {
-        var r = e.kind + "";
-        if ("method" !== r && "field" !== r) throw new TypeError('An element descriptor\'s .kind property must be either "method" or "field", but a decorator created an element descriptor with .kind "' + r + '"');
-        var t = _toPropertyKey(e.key),
-          i = e.placement + "";
-        if ("static" !== i && "prototype" !== i && "own" !== i) throw new TypeError('An element descriptor\'s .placement property must be one of "static", "prototype" or "own", but a decorator created an element descriptor with .placement "' + i + '"');
-        var o = e.descriptor;
-        this.disallowProperty(e, "elements", "An element descriptor");
-        var n = {
-          kind: r,
-          key: t,
-          placement: i,
-          descriptor: Object.assign({}, o)
-        };
-        return "field" !== r ? this.disallowProperty(e, "initializer", "A method descriptor") : (this.disallowProperty(o, "get", "The property descriptor of a field descriptor"), this.disallowProperty(o, "set", "The property descriptor of a field descriptor"), this.disallowProperty(o, "value", "The property descriptor of a field descriptor"), n.initializer = e.initializer), n;
-      },
-      toElementFinisherExtras: function (e) {
-        return {
-          element: this.toElementDescriptor(e),
-          finisher: _optionalCallableProperty(e, "finisher"),
-          extras: this.toElementDescriptors(e.extras)
-        };
-      },
-      fromClassDescriptor: function (e) {
-        var r = {
-          kind: "class",
-          elements: e.map(this.fromElementDescriptor, this)
-        };
-        return Object.defineProperty(r, Symbol.toStringTag, {
-          value: "Descriptor",
-          configurable: !0
-        }), r;
-      },
-      toClassDescriptor: function (e) {
-        var r = e.kind + "";
-        if ("class" !== r) throw new TypeError('A class descriptor\'s .kind property must be "class", but a decorator created a class descriptor with .kind "' + r + '"');
-        this.disallowProperty(e, "key", "A class descriptor"), this.disallowProperty(e, "placement", "A class descriptor"), this.disallowProperty(e, "descriptor", "A class descriptor"), this.disallowProperty(e, "initializer", "A class descriptor"), this.disallowProperty(e, "extras", "A class descriptor");
-        var t = _optionalCallableProperty(e, "finisher");
-        return {
-          elements: this.toElementDescriptors(e.elements),
-          finisher: t
-        };
-      },
-      runClassFinishers: function (e, r) {
-        for (var t = 0; t < r.length; t++) {
-          var i = (0, r[t])(e);
-          if (void 0 !== i) {
-            if ("function" != typeof i) throw new TypeError("Finishers must return a constructor.");
-            e = i;
-          }
-        }
-        return e;
-      },
-      disallowProperty: function (e, r, t) {
-        if (void 0 !== e[r]) throw new TypeError(t + " can't have a ." + r + " property.");
-      }
-    };
-    return e;
-  }
-  function _createElementDescriptor(e) {
-    var r,
-      t = _toPropertyKey(e.key);
-    "method" === e.kind ? r = {
-      value: e.value,
-      writable: !0,
-      configurable: !0,
-      enumerable: !1
-    } : "get" === e.kind ? r = {
-      get: e.value,
-      configurable: !0,
-      enumerable: !1
-    } : "set" === e.kind ? r = {
-      set: e.value,
-      configurable: !0,
-      enumerable: !1
-    } : "field" === e.kind && (r = {
-      configurable: !0,
-      writable: !0,
-      enumerable: !0
-    });
-    var i = {
-      kind: "field" === e.kind ? "field" : "method",
-      key: t,
-      placement: e.static ? "static" : "field" === e.kind ? "own" : "prototype",
-      descriptor: r
-    };
-    return e.decorators && (i.decorators = e.decorators), "field" === e.kind && (i.initializer = e.value), i;
-  }
-  function _coalesceGetterSetter(e, r) {
-    void 0 !== e.descriptor.get ? r.descriptor.get = e.descriptor.get : r.descriptor.set = e.descriptor.set;
-  }
-  function _coalesceClassElements(e) {
-    for (var r = [], isSameElement = function (e) {
-        return "method" === e.kind && e.key === o.key && e.placement === o.placement;
-      }, t = 0; t < e.length; t++) {
-      var i,
-        o = e[t];
-      if ("method" === o.kind && (i = r.find(isSameElement))) {
-        if (_isDataDescriptor(o.descriptor) || _isDataDescriptor(i.descriptor)) {
-          if (_hasDecorators(o) || _hasDecorators(i)) throw new ReferenceError("Duplicated methods (" + o.key + ") can't be decorated.");
-          i.descriptor = o.descriptor;
-        } else {
-          if (_hasDecorators(o)) {
-            if (_hasDecorators(i)) throw new ReferenceError("Decorators can't be placed on different accessors with for the same property (" + o.key + ").");
-            i.decorators = o.decorators;
-          }
-          _coalesceGetterSetter(o, i);
-        }
-      } else r.push(o);
-    }
-    return r;
-  }
-  function _hasDecorators(e) {
-    return e.decorators && e.decorators.length;
-  }
-  function _isDataDescriptor(e) {
-    return void 0 !== e && !(void 0 === e.value && void 0 === e.writable);
-  }
-  function _optionalCallableProperty(e, r) {
-    var t = e[r];
-    if (void 0 !== t && "function" != typeof t) throw new TypeError("Expected '" + r + "' to be a function");
-    return t;
-  }
-  function _iterableToArray(r) {
-    if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
-  }
-  function _nonIterableRest() {
-    throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-  }
   function _taggedTemplateLiteral(e, t) {
     return t || (t = e.slice(0)), Object.freeze(Object.defineProperties(e, {
       raw: {
@@ -268,38 +8,14 @@
       }
     }));
   }
-  function _toArray(r) {
-    return _arrayWithHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableRest();
-  }
-  function _toPrimitive(t, r) {
-    if ("object" != typeof t || !t) return t;
-    var e = t[Symbol.toPrimitive];
-    if (void 0 !== e) {
-      var i = e.call(t, r || "default");
-      if ("object" != typeof i) return i;
-      throw new TypeError("@@toPrimitive must return a primitive value.");
-    }
-    return ("string" === r ? String : Number)(t);
-  }
-  function _toPropertyKey(t) {
-    var i = _toPrimitive(t, "string");
-    return "symbol" == typeof i ? i : i + "";
-  }
-  function _unsupportedIterableToArray(r, a) {
-    if (r) {
-      if ("string" == typeof r) return _arrayLikeToArray(r, a);
-      var t = {}.toString.call(r).slice(8, -1);
-      return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
-    }
-  }
 
   /**
    * @license
    * Copyright 2019 Google LLC
    * SPDX-License-Identifier: BSD-3-Clause
    */
-  const t$2 = globalThis,
-    e$2 = t$2.ShadowRoot && (void 0 === t$2.ShadyCSS || t$2.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype,
+  const t$1 = globalThis,
+    e$2 = t$1.ShadowRoot && (void 0 === t$1.ShadyCSS || t$1.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype,
     s$1 = Symbol(),
     o$2 = new WeakMap();
   let n$2 = class n {
@@ -335,7 +51,7 @@
     S$1 = (s, o) => {
       if (e$2) s.adoptedStyleSheets = o.map(t => t instanceof CSSStyleSheet ? t : t.styleSheet);else for (const e of o) {
         const o = document.createElement("style"),
-          n = t$2.litNonce;
+          n = t$1.litNonce;
         void 0 !== n && o.setAttribute("nonce", n), o.textContent = e.cssText, s.appendChild(o);
       }
     },
@@ -638,8 +354,8 @@
    * Copyright 2017 Google LLC
    * SPDX-License-Identifier: BSD-3-Clause
    */
-  const t$1 = globalThis,
-    i$1 = t$1.trustedTypes,
+  const t = globalThis,
+    i$1 = t.trustedTypes,
     s = i$1 ? i$1.createPolicy("lit-html", {
       createHTML: t => t
     }) : void 0,
@@ -960,8 +676,8 @@
       S(this, t);
     }
   }
-  const j = t$1.litHtmlPolyfillSupport;
-  j !== null && j !== void 0 && j(N, R), ((_t$litHtmlVersions = t$1.litHtmlVersions) !== null && _t$litHtmlVersions !== void 0 ? _t$litHtmlVersions : t$1.litHtmlVersions = []).push("3.2.1");
+  const j = t.litHtmlPolyfillSupport;
+  j !== null && j !== void 0 && j(N, R), ((_t$litHtmlVersions = t.litHtmlVersions) !== null && _t$litHtmlVersions !== void 0 ? _t$litHtmlVersions : t.litHtmlVersions = []).push("3.2.1");
   const B = (t, i, s) => {
     var _s$renderBefore;
     const e = (_s$renderBefore = s === null || s === void 0 ? void 0 : s.renderBefore) !== null && _s$renderBefore !== void 0 ? _s$renderBefore : i;
@@ -1016,158 +732,68 @@
   });
   ((_globalThis$litElemen2 = globalThis.litElementVersions) !== null && _globalThis$litElemen2 !== void 0 ? _globalThis$litElemen2 : globalThis.litElementVersions = []).push("4.1.1");
 
-  /**
-   * @license
-   * Copyright 2017 Google LLC
-   * SPDX-License-Identifier: BSD-3-Clause
-   */
-  const t = t => (e, o) => {
-    void 0 !== o ? o.addInitializer(() => {
-      customElements.define(t, e);
-    }) : customElements.define(t, e);
-  };
-
   var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5;
-  _decorate([t('gewe-notify-card')], function (_initialize, _LitElement) {
-    class FetchContactsCard extends _LitElement {
-      constructor() {
-        super();
-        _initialize(this);
-        this.currentTab = 'friends'; // 默认显示朋友标签
-        this.page = 1;
-        this.friends = [];
-        this.chatrooms = [];
-        this.filteredFriends = [];
-        this.filteredChatrooms = [];
-        this.filterText = '';
-        this.filterTimeout = null; // 防抖用的计时器
-      }
-
-      // 获取数据的函数
-
-      // 过滤数据的函数
-
-      // 处理标签切换
-
-      // 处理分页
-
-      // 处理过滤输入变化（防抖优化）
-
-      // 渲染数据并显示分页
-
-      // 在卡片首次加载时获取数据
+  class FetchContactsCard extends r {
+    static get styles() {
+      return i$3(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n      .card {\n        padding: 16px;\n        background: var(--ha-card-background);\n        border-radius: 8px;\n      }\n\n      .page-button {\n        margin-top: 16px;\n        cursor: pointer;\n        padding: 8px;\n        background-color: var(--primary-color);\n        color: white;\n        border-radius: 4px;\n        font-weight: bold;\n        text-align: center;\n      }\n\n      .tab {\n        display: flex;\n        justify-content: space-around;\n        cursor: pointer;\n        margin-bottom: 16px;\n        padding: 8px;\n        background-color: var(--secondary-background-color);\n        border-radius: 8px;\n      }\n\n      .tab.active {\n        background-color: var(--primary-color);\n        color: white;\n      }\n\n      .data-item {\n        display: flex;\n        flex-direction: column;\n        align-items: center;\n        margin-bottom: 12px;\n        text-align: center;\n      }\n\n      .avatar {\n        width: 50px;\n        height: 50px;\n        border-radius: 50%;\n      }\n\n      .pagination {\n        display: flex;\n        justify-content: center;\n        margin-top: 16px;\n      }\n\n      .filter-container {\n        margin-bottom: 16px;\n        display: flex;\n        justify-content: space-between;\n      }\n\n      .filter-input {\n        padding: 8px;\n        width: 30%;\n        margin-right: 10px;\n        border-radius: 4px;\n        border: 1px solid var(--primary-color);\n      }\n    "])));
     }
-    return {
-      F: FetchContactsCard,
-      d: [{
-        kind: "field",
-        static: true,
-        key: "styles",
-        value() {
-          return i$3(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n    .card {\n      padding: 16px;\n      background: var(--ha-card-background);\n      border-radius: 8px;\n    }\n\n    .page-button {\n      margin-top: 16px;\n      cursor: pointer;\n      padding: 8px;\n      background-color: var(--primary-color);\n      color: white;\n      border-radius: 4px;\n      font-weight: bold;\n      text-align: center;\n    }\n\n    .tab {\n      display: flex;\n      justify-content: space-around;\n      cursor: pointer;\n      margin-bottom: 16px;\n      padding: 8px;\n      background-color: var(--secondary-background-color);\n      border-radius: 8px;\n    }\n\n    .tab.active {\n      background-color: var(--primary-color);\n      color: white;\n    }\n\n    .data-item {\n      display: flex;\n      flex-direction: column;\n      align-items: center;\n      margin-bottom: 12px;\n      text-align: center;\n    }\n\n    .avatar {\n      width: 50px;\n      height: 50px;\n      border-radius: 50%;\n    }\n\n    .pagination {\n      display: flex;\n      justify-content: center;\n      margin-top: 16px;\n    }\n\n    .filter-container {\n      margin-bottom: 16px;\n      display: flex;\n      justify-content: space-between;\n    }\n\n    .filter-input {\n      padding: 8px;\n      width: 30%;\n      margin-right: 10px;\n      border-radius: 4px;\n      border: 1px solid var(--primary-color);\n    }\n  "])));
-        }
-      }, {
-        kind: "field",
-        static: true,
-        key: "properties",
-        value() {
-          return {
-            hass: {
-              type: Object
-            },
-            currentTab: {
-              type: String
-            },
-            page: {
-              type: Number
-            },
-            friends: {
-              type: Array
-            },
-            chatrooms: {
-              type: Array
-            },
-            filteredFriends: {
-              type: Array
-            },
-            filteredChatrooms: {
-              type: Array
-            },
-            filterText: {
-              type: String
-            }
-          };
-        }
-      }, {
-        kind: "method",
-        key: "fetchData",
-        value: async function fetchData() {
-          try {
-            const result = await this.hass.callApi('GET', '/api/gewe_contacts');
-            this.friends = result.attributes.friends || [];
-            this.chatrooms = result.attributes.chatrooms || [];
-
-            // 初始过滤
-            this.filterData();
-          } catch (error) {
-            console.error('Error fetching contacts:', error);
-          }
-        }
-      }, {
-        kind: "method",
-        key: "filterData",
-        value: function filterData() {
-          const filterText = this.filterText.toLowerCase();
-          this.filteredFriends = this.friends.filter(item => [item.userName, item.nickName, item.remark].join(' ').toLowerCase().includes(filterText));
-          this.filteredChatrooms = this.chatrooms.filter(item => [item.userName, item.nickName, item.remark].join(' ').toLowerCase().includes(filterText));
-        }
-      }, {
-        kind: "method",
-        key: "handleTabChange",
-        value: function handleTabChange(tab) {
-          this.currentTab = tab;
-          this.page = 1; // 切换标签时重置页面为第一页
-          this.requestUpdate();
-        }
-      }, {
-        kind: "method",
-        key: "handlePageChange",
-        value: function handlePageChange(page) {
-          this.page = page;
-          this.requestUpdate();
-        }
-      }, {
-        kind: "method",
-        key: "handleFilterChange",
-        value: function handleFilterChange(event) {
-          clearTimeout(this.filterTimeout);
-          this.filterTimeout = setTimeout(() => {
-            this.filterText = event.target.value;
-            this.filterData();
-            this.page = 1; // 清空分页
-            this.requestUpdate();
-          }, 300); // 延迟 300 毫秒
-        }
-      }, {
-        kind: "method",
-        key: "render",
-        value: function render() {
-          const itemsPerPage = 5;
-          const currentPageData = this.currentTab === 'friends' ? this.filteredFriends : this.filteredChatrooms;
-          const totalPages = Math.ceil(currentPageData.length / itemsPerPage);
-          const startIndex = (this.page - 1) * itemsPerPage;
-          const endIndex = startIndex + itemsPerPage;
-          const currentPageDataSlice = currentPageData.slice(startIndex, endIndex);
-          return x(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n      <ha-card class=\"card\">\n        <h1>Contacts</h1>\n\n        <!-- \u8FC7\u6EE4\u8F93\u5165\u6846 -->\n        <div class=\"filter-container\">\n          <input\n            class=\"filter-input\"\n            type=\"text\"\n            .value=\"", "\"\n            @input=\"", "\"\n            placeholder=\"Filter by userName, nickName, or remark\"\n          />\n        </div>\n\n        <!-- Tab \u5207\u6362\u6309\u94AE -->\n        <div class=\"tab-container\">\n          <div\n            class=\"tab ", "\"\n            @click=\"", "\"\n          >\n            Friends\n          </div>\n          <div\n            class=\"tab ", "\"\n            @click=\"", "\"\n          >\n            Chatrooms\n          </div>\n        </div>\n\n        <!-- \u6E32\u67D3\u5F53\u524D\u6807\u7B7E\u7684\u6570\u636E -->\n        <div class=\"data-list\">\n          ", "\n        </div>\n\n        <!-- \u5206\u9875 -->\n        <div class=\"pagination\">\n          ", "\n          <span>Page ", " of ", "</span>\n          ", "\n        </div>\n      </ha-card>\n    "])), this.filterText, this.handleFilterChange, this.currentTab === 'friends' ? 'active' : '', () => this.handleTabChange('friends'), this.currentTab === 'chatrooms' ? 'active' : '', () => this.handleTabChange('chatrooms'), currentPageDataSlice.map(item => x(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n              <div class=\"data-item\">\n                <img\n                  class=\"avatar\"\n                  src=\"", "\"\n                  alt=\"avatar\"\n                />\n                <div><strong>", "</strong></div>\n                <div>", "</div>\n                <div>", "</div>\n              </div>\n            "])), item.smallHeadImgUrl || '/local/default-avatar.png', item.userName, item.nickName, item.remark)), this.page > 1 ? x(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n                <button\n                  class=\"page-button\"\n                  @click=\"", "\"\n                >\n                  Previous\n                </button>\n              "])), () => this.handlePageChange(this.page - 1)) : '', this.page, totalPages, this.page < totalPages ? x(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n                <button\n                  class=\"page-button\"\n                  @click=\"", "\"\n                >\n                  Next\n                </button>\n              "])), () => this.handlePageChange(this.page + 1)) : '');
-        }
-      }, {
-        kind: "method",
-        key: "firstUpdated",
-        value: function firstUpdated() {
-          this.fetchData();
-        }
-      }]
-    };
-  }, r);
+    constructor() {
+      super();
+      this.currentTab = 'friends'; // 默认显示朋友标签
+      this.page = 1;
+      this.friends = [];
+      this.chatrooms = [];
+      this.filteredFriends = [];
+      this.filteredChatrooms = [];
+      this.filterText = '';
+      this.filterTimeout = null; // 防抖用的计时器
+      this.hass = {}; // 初始化为空对象，后续需要在 firstUpdated 中赋值
+    }
+    fetchData() {
+      return this.hass.callApi('GET', '/api/gewe_contacts').then(result => {
+        this.friends = result.attributes.friends || [];
+        this.chatrooms = result.attributes.chatrooms || [];
+        this.filterData();
+      }).catch(error => {
+        console.error('Error fetching contacts:', error);
+      });
+    }
+    filterData() {
+      const filterText = this.filterText.toLowerCase();
+      this.filteredFriends = this.friends.filter(item => [item.userName, item.nickName, item.remark].join(' ').toLowerCase().includes(filterText));
+      this.filteredChatrooms = this.chatrooms.filter(item => [item.userName, item.nickName, item.remark].join(' ').toLowerCase().includes(filterText));
+    }
+    handleTabChange(tab) {
+      this.currentTab = tab;
+      this.page = 1; // 切换标签时重置页面为第一页
+      this.requestUpdate();
+    }
+    handlePageChange(page) {
+      this.page = page;
+      this.requestUpdate();
+    }
+    handleFilterChange(event) {
+      clearTimeout(this.filterTimeout);
+      this.filterTimeout = setTimeout(() => {
+        this.filterText = event.target.value;
+        this.filterData();
+        this.page = 1; // 清空分页
+        this.requestUpdate();
+      }, 300); // 延迟 300 毫秒
+    }
+    render() {
+      const itemsPerPage = 5;
+      const currentPageData = this.currentTab === 'friends' ? this.filteredFriends : this.filteredChatrooms;
+      const totalPages = Math.ceil(currentPageData.length / itemsPerPage);
+      const startIndex = (this.page - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const currentPageDataSlice = currentPageData.slice(startIndex, endIndex);
+      return x(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n      <ha-card class=\"card\">\n        <h1>Contacts</h1>\n\n        <!-- \u8FC7\u6EE4\u8F93\u5165\u6846 -->\n        <div class=\"filter-container\">\n          <input\n            class=\"filter-input\"\n            type=\"text\"\n            .value=\"", "\"\n            @input=\"", "\"\n            placeholder=\"Filter by userName, nickName, or remark\"\n          />\n        </div>\n\n        <!-- Tab \u5207\u6362\u6309\u94AE -->\n        <div class=\"tab-container\">\n          <div\n            class=\"tab ", "\"\n            @click=\"", "\"\n          >\n            Friends\n          </div>\n          <div\n            class=\"tab ", "\"\n            @click=\"", "\"\n          >\n            Chatrooms\n          </div>\n        </div>\n\n        <!-- \u6E32\u67D3\u5F53\u524D\u6807\u7B7E\u7684\u6570\u636E -->\n        <div class=\"data-list\">\n          ", "\n        </div>\n\n        <!-- \u5206\u9875 -->\n        <div class=\"pagination\">\n          ", "\n          <span>Page ", " of ", "</span>\n          ", "\n        </div>\n      </ha-card>\n    "])), this.filterText, this.handleFilterChange, this.currentTab === 'friends' ? 'active' : '', () => this.handleTabChange('friends'), this.currentTab === 'chatrooms' ? 'active' : '', () => this.handleTabChange('chatrooms'), currentPageDataSlice.map(item => x(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n              <div class=\"data-item\">\n                <img\n                  class=\"avatar\"\n                  src=\"", "\"\n                  alt=\"avatar\"\n                />\n                <div><strong>", "</strong></div>\n                <div>", "</div>\n                <div>", "</div>\n              </div>\n            "])), item.smallHeadImgUrl || '/local/default-avatar.png', item.userName, item.nickName, item.remark)), this.page > 1 ? x(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n                <button\n                  class=\"page-button\"\n                  @click=\"", "\"\n                >\n                  Previous\n                </button>\n              "])), () => this.handlePageChange(this.page - 1)) : '', this.page, totalPages, this.page < totalPages ? x(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n                <button\n                  class=\"page-button\"\n                  @click=\"", "\"\n                >\n                  Next\n                </button>\n              "])), () => this.handlePageChange(this.page + 1)) : '');
+    }
+    firstUpdated() {
+      this.fetchData();
+    }
+  }
+  customElements.define('gewe-notify-card', FetchContactsCard);
 
 })();
