@@ -2,9 +2,8 @@ import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { HomeAssistant } from 'custom-card-helpers'; // 引入 Home Assistant 的工具库
 
-@customElement('fetch-contacts-card')
+@customElement('gewe-notify-card')
 class FetchContactsCard extends LitElement {
-
   static styles = css`
     .card {
       padding: 16px;
@@ -86,46 +85,53 @@ class FetchContactsCard extends LitElement {
 
   constructor() {
     super();
-    this.currentTab = 'friends';  // 默认显示朋友标签
+    this.currentTab = 'friends'; // 默认显示朋友标签
     this.page = 1;
     this.friends = [];
     this.chatrooms = [];
     this.filteredFriends = [];
     this.filteredChatrooms = [];
     this.filterText = '';
+    this.filterTimeout = null; // 防抖用的计时器
   }
 
   // 获取数据的函数
   async fetchData() {
-    const result = await this.hass.callApi('GET', '/api/gewe_contacts');
-    this.friends = result.attributes.friends || [];
-    this.chatrooms = result.attributes.chatrooms || [];
+    try {
+      const result = await this.hass.callApi('GET', '/api/gewe_contacts');
+      this.friends = result.attributes.friends || [];
+      this.chatrooms = result.attributes.chatrooms || [];
 
-    // 初始过滤
-    this.filterData();
+      // 初始过滤
+      this.filterData();
+    } catch (error) {
+      console.error('Error fetching contacts:', error);
+    }
   }
 
   // 过滤数据的函数
   filterData() {
     const filterText = this.filterText.toLowerCase();
 
-    this.filteredFriends = this.friends.filter(item => 
-      item.userName.toLowerCase().includes(filterText) ||
-      item.nickName.toLowerCase().includes(filterText) ||
-      item.remark.toLowerCase().includes(filterText)
+    this.filteredFriends = this.friends.filter((item) =>
+      [item.userName, item.nickName, item.remark]
+        .join(' ')
+        .toLowerCase()
+        .includes(filterText)
     );
 
-    this.filteredChatrooms = this.chatrooms.filter(item => 
-      item.userName.toLowerCase().includes(filterText) ||
-      item.nickName.toLowerCase().includes(filterText) ||
-      item.remark.toLowerCase().includes(filterText)
+    this.filteredChatrooms = this.chatrooms.filter((item) =>
+      [item.userName, item.nickName, item.remark]
+        .join(' ')
+        .toLowerCase()
+        .includes(filterText)
     );
   }
 
   // 处理标签切换
   handleTabChange(tab) {
     this.currentTab = tab;
-    this.page = 1;  // 切换标签时重置页面为第一页
+    this.page = 1; // 切换标签时重置页面为第一页
     this.requestUpdate();
   }
 
@@ -135,24 +141,26 @@ class FetchContactsCard extends LitElement {
     this.requestUpdate();
   }
 
-  // 处理过滤输入变化
+  // 处理过滤输入变化（防抖优化）
   handleFilterChange(event) {
-    this.filterText = event.target.value;
-    this.filterData(); // 每次输入时重新过滤数据
-    this.page = 1;  // 清空分页
-    this.requestUpdate();
+    clearTimeout(this.filterTimeout);
+    this.filterTimeout = setTimeout(() => {
+      this.filterText = event.target.value;
+      this.filterData();
+      this.page = 1; // 清空分页
+      this.requestUpdate();
+    }, 300); // 延迟 300 毫秒
   }
 
   // 渲染数据并显示分页
   render() {
     const itemsPerPage = 5;
-    let currentPageData = [];
-    if (this.currentTab === 'friends') {
-      currentPageData = this.filteredFriends;
-    } else if (this.currentTab === 'chatrooms') {
-      currentPageData = this.filteredChatrooms;
-    }
+    const currentPageData =
+      this.currentTab === 'friends'
+        ? this.filteredFriends
+        : this.filteredChatrooms;
 
+    const totalPages = Math.ceil(currentPageData.length / itemsPerPage);
     const startIndex = (this.page - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const currentPageDataSlice = currentPageData.slice(startIndex, endIndex);
@@ -163,7 +171,7 @@ class FetchContactsCard extends LitElement {
 
         <!-- 过滤输入框 -->
         <div class="filter-container">
-          <input 
+          <input
             class="filter-input"
             type="text"
             .value="${this.filterText}"
@@ -174,39 +182,68 @@ class FetchContactsCard extends LitElement {
 
         <!-- Tab 切换按钮 -->
         <div class="tab-container">
-          <div 
+          <div
             class="tab ${this.currentTab === 'friends' ? 'active' : ''}"
-            @click="${() => this.handleTabChange('friends')}">Friends</div>
-          <div 
+            @click="${() => this.handleTabChange('friends')}"
+          >
+            Friends
+          </div>
+          <div
             class="tab ${this.currentTab === 'chatrooms' ? 'active' : ''}"
-            @click="${() => this.handleTabChange('chatrooms')}">Chatrooms</div>
+            @click="${() => this.handleTabChange('chatrooms')}"
+          >
+            Chatrooms
+          </div>
         </div>
 
         <!-- 渲染当前标签的数据 -->
         <div class="data-list">
-          ${currentPageDataSlice.map(item => html`
-            <div class="data-item">
-              <img class="avatar" src="${item.smallHeadImgUrl}" alt="avatar">
-              <div><strong>${item.userName}</strong></div>
-              <div>${item.nickName}</div>
-              <div>${item.remark}</div>
-            </div>
-          `)}
+          ${currentPageDataSlice.map(
+            (item) => html`
+              <div class="data-item">
+                <img
+                  class="avatar"
+                  src="${item.smallHeadImgUrl || '/local/default-avatar.png'}"
+                  alt="avatar"
+                />
+                <div><strong>${item.userName}</strong></div>
+                <div>${item.nickName}</div>
+                <div>${item.remark}</div>
+              </div>
+            `
+          )}
         </div>
 
         <!-- 分页 -->
         <div class="pagination">
-          ${this.page > 1 ? html`<button class="page-button" @click="${() => this.handlePageChange(this.page - 1)}">Previous</button>` : ''}
-          <span>Page ${this.page}</span>
-          ${this.page * itemsPerPage < currentPageData.length ? html`<button class="page-button" @click="${() => this.handlePageChange(this.page + 1)}">Next</button>` : ''}
+          ${this.page > 1
+            ? html`
+                <button
+                  class="page-button"
+                  @click="${() => this.handlePageChange(this.page - 1)}"
+                >
+                  Previous
+                </button>
+              `
+            : ''}
+          <span>Page ${this.page} of ${totalPages}</span>
+          ${this.page < totalPages
+            ? html`
+                <button
+                  class="page-button"
+                  @click="${() => this.handlePageChange(this.page + 1)}"
+                >
+                  Next
+                </button>
+              `
+            : ''}
         </div>
       </ha-card>
     `;
   }
 
   // 在卡片首次加载时获取数据
-  connectedCallback() {
-    super.connectedCallback();
+  firstUpdated() {
     this.fetchData();
   }
 }

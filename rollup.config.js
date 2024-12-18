@@ -1,25 +1,26 @@
-import resolve from 'rollup-plugin-node-resolve';
-import { terser } from 'rollup-plugin-terser';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 import babel from '@rollup/plugin-babel';
 
 export default {
-  input: 'src/gewe-notify-card.js', // 入口文件
+  input: 'src/gewe-notify-card.js', // 源代码路径
   output: {
-    file: 'dist/gewe-notify-card.js', // 打包后的文件
-    format: 'esm', // 输出格式
-    globals: {
-      'lit-element': 'litElement',
-      'custom-card-helpers': 'customCardHelpers'
-    },
+    file: 'dist/gewe-notify-card.js', // 输出路径
+    format: 'iife', // 兼容性更强的格式
+    name: 'GeweNotifyCard', // 全局变量名
   },
   plugins: [
     resolve(),
+    commonjs(),
     babel({
       babelHelpers: 'bundled',
-      exclude: 'node_modules/**',
-      plugins: [['@babel/plugin-proposal-decorators', { legacy: true }]]
+      presets: [
+        ['@babel/preset-env', { targets: '> 0.25%, not dead' }],
+      ],
+      plugins: [
+        ['@babel/plugin-proposal-decorators', { decoratorsBeforeExport: true }], // 启用装饰器支持
+      ],
     }),
-    terser(), // 压缩代码
   ],
 };
 
