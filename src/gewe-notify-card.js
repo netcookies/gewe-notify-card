@@ -2,7 +2,7 @@ import { LitElement, html, css } from 'lit';
 import { HomeAssistant } from 'custom-card-helpers';
 import '@webcomponents/webcomponentsjs';
 
-class FetchContactsCard extends LitElement {
+class GeweNotifyCard extends LitElement {
   static get styles() {
     return css`
       .card {
@@ -231,5 +231,5 @@ class FetchContactsCard extends LitElement {
   }
 }
 
-customElements.define('gewe-notify-card', FetchContactsCard);
+customElements.define('gewe-notify-card', GeweNotifyCard);
 

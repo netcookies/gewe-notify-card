@@ -733,7 +733,7 @@
   ((_globalThis$litElemen2 = globalThis.litElementVersions) !== null && _globalThis$litElemen2 !== void 0 ? _globalThis$litElemen2 : globalThis.litElementVersions = []).push("4.1.1");
 
   var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5;
-  class FetchContactsCard extends r {
+  class GeweNotifyCard extends r {
     static get styles() {
       return i$3(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n      .card {\n        padding: 16px;\n        background: var(--ha-card-background);\n        border-radius: 8px;\n      }\n\n      .page-button {\n        margin-top: 16px;\n        cursor: pointer;\n        padding: 8px;\n        background-color: var(--primary-color);\n        color: white;\n        border-radius: 4px;\n        font-weight: bold;\n        text-align: center;\n      }\n\n      .tab {\n        display: flex;\n        justify-content: space-around;\n        cursor: pointer;\n        margin-bottom: 16px;\n        padding: 8px;\n        background-color: var(--secondary-background-color);\n        border-radius: 8px;\n      }\n\n      .tab.active {\n        background-color: var(--primary-color);\n        color: white;\n      }\n\n      .data-item {\n        display: flex;\n        flex-direction: column;\n        align-items: center;\n        margin-bottom: 12px;\n        text-align: center;\n      }\n\n      .avatar {\n        width: 50px;\n        height: 50px;\n        border-radius: 50%;\n      }\n\n      .pagination {\n        display: flex;\n        justify-content: center;\n        margin-top: 16px;\n      }\n\n      .filter-container {\n        margin-bottom: 16px;\n        display: flex;\n        justify-content: space-between;\n      }\n\n      .filter-input {\n        padding: 8px;\n        width: 30%;\n        margin-right: 10px;\n        border-radius: 4px;\n        border: 1px solid var(--primary-color);\n      }\n    "])));
     }
@@ -794,6 +794,6 @@
       this.fetchData();
     }
   }
-  customElements.define('gewe-notify-card', FetchContactsCard);
+  customElements.define('gewe-notify-card', GeweNotifyCard);
 
 })();
