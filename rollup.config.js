@@ -18,7 +18,8 @@ export default {
         ['@babel/preset-env', { targets: '> 0.25%, not dead' }],
       ],
       plugins: [
-        ['@babel/plugin-proposal-decorators', { decoratorsBeforeExport: true }], // 启用装饰器支持
+        ["@babel/plugin-proposal-decorators", { "decoratorsBeforeExport": true }],
+        ["@babel/plugin-proposal-class-properties", { "loose": true }]
       ],
     }),
   ],

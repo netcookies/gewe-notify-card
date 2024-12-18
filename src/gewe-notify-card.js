@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { HomeAssistant } from 'custom-card-helpers'; // 引入 Home Assistant 的工具库
+import '@webcomponents/webcomponentsjs';
 
 @customElement('gewe-notify-card')
 class FetchContactsCard extends LitElement {
