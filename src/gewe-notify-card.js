@@ -96,6 +96,15 @@ class GeweNotifyCard extends LitElement {
       transform: translateX(5px);
     }
 
+    .data-item > div {
+      flex: 1;
+      padding-right: 20px;
+    }
+
+    .data-item > div:not(:last-child) {
+      margin-right: 20px;
+    }
+
     .avatar {
       width: 50px;
       height: 50px;
@@ -285,7 +294,7 @@ class GeweNotifyCard extends LitElement {
           </div>
           ${currentPageDataSlice.map(item => html`
             <div class="data-item">
-              <img class="avatar" src="${item.smallHeadImgUrl || '/local/default-avatar.png'}" alt="avatar" />
+              <img class="avatar" src="${item.smallHeadImgUrl || '/local/gewe-notify-card/images/default-avatar.png'}" alt="avatar" />
               <div>${item.userName}</div>
               <div>${item.nickName}</div>
               <div>${item.remark}</div>
