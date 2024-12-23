@@ -1,12 +1,34 @@
 (function () {
   'use strict';
 
+  function _defineProperty(e, r, t) {
+    return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
+      value: t,
+      enumerable: !0,
+      configurable: !0,
+      writable: !0
+    }) : e[r] = t, e;
+  }
   function _taggedTemplateLiteral(e, t) {
     return t || (t = e.slice(0)), Object.freeze(Object.defineProperties(e, {
       raw: {
         value: Object.freeze(t)
       }
     }));
+  }
+  function _toPrimitive(t, r) {
+    if ("object" != typeof t || !t) return t;
+    var e = t[Symbol.toPrimitive];
+    if (void 0 !== e) {
+      var i = e.call(t, r || "default");
+      if ("object" != typeof i) return i;
+      throw new TypeError("@@toPrimitive must return a primitive value.");
+    }
+    return ("string" === r ? String : Number)(t);
+  }
+  function _toPropertyKey(t) {
+    var i = _toPrimitive(t, "string");
+    return "symbol" == typeof i ? i : i + "";
   }
 
   /**
@@ -734,23 +756,75 @@
 
   var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5;
   class GeweNotifyCard extends r {
-    static get styles() {
-      return i$3(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n      .card {\n        padding: 16px;\n        background: var(--ha-card-background);\n        border-radius: 8px;\n      }\n\n      .page-button {\n        margin-top: 16px;\n        cursor: pointer;\n        padding: 8px;\n        background-color: var(--primary-color);\n        color: white;\n        border-radius: 4px;\n        font-weight: bold;\n        text-align: center;\n      }\n\n      .tab {\n        display: flex;\n        justify-content: space-around;\n        cursor: pointer;\n        margin-bottom: 16px;\n        padding: 8px;\n        background-color: var(--secondary-background-color);\n        border-radius: 8px;\n      }\n\n      .tab.active {\n        background-color: var(--primary-color);\n        color: white;\n      }\n\n      .data-item {\n        display: flex;\n        flex-direction: column;\n        align-items: center;\n        margin-bottom: 12px;\n        text-align: center;\n      }\n\n      .avatar {\n        width: 50px;\n        height: 50px;\n        border-radius: 50%;\n      }\n\n      .pagination {\n        display: flex;\n        justify-content: center;\n        margin-top: 16px;\n      }\n\n      .filter-container {\n        margin-bottom: 16px;\n        display: flex;\n        justify-content: space-between;\n      }\n\n      .filter-input {\n        padding: 8px;\n        width: 30%;\n        margin-right: 10px;\n        border-radius: 4px;\n        border: 1px solid var(--primary-color);\n      }\n    "])));
+    static get properties() {
+      return {
+        hass: {
+          type: Object
+        },
+        config: {
+          type: Object
+        },
+        currentTab: {
+          type: String
+        },
+        page: {
+          type: Number
+        },
+        friends: {
+          type: Array
+        },
+        chatrooms: {
+          type: Array
+        },
+        filteredFriends: {
+          type: Array
+        },
+        filteredChatrooms: {
+          type: Array
+        },
+        filterText: {
+          type: String
+        },
+        filterTimeout: {
+          type: Number
+        }
+      };
     }
     constructor() {
       super();
-      this.currentTab = 'friends'; // 默认显示朋友标签
+      this.currentTab = 'friends';
       this.page = 1;
       this.friends = [];
       this.chatrooms = [];
       this.filteredFriends = [];
       this.filteredChatrooms = [];
       this.filterText = '';
-      this.filterTimeout = null; // 防抖用的计时器
-      this.hass = {}; // 初始化为空对象，后续需要在 firstUpdated 中赋值
+      this.filterTimeout = null;
+      this.hass = {};
+      this.config = {};
+    }
+    setConfig(config) {
+      if (!config || !config.hass) {
+        throw new Error('Invalid configuration');
+      }
+      this.config = config;
+      this.hass = config.hass;
+    }
+    updated(changedProperties) {
+      if (changedProperties.has('hass')) {
+        this.fetchData();
+      }
+      if (changedProperties.has('filterText')) {
+        clearTimeout(this.filterTimeout);
+        this.filterTimeout = setTimeout(() => {
+          this.filterData();
+          this.page = 1;
+        }, 300);
+      }
     }
     fetchData() {
-      return this.hass.callApi('GET', '/api/gewe_contacts').then(result => {
+      if (!this.hass) return;
+      this.hass.callApi('GET', '/api/gewe_contacts').then(result => {
         this.friends = result.attributes.friends || [];
         this.chatrooms = result.attributes.chatrooms || [];
         this.filterData();
@@ -765,21 +839,13 @@
     }
     handleTabChange(tab) {
       this.currentTab = tab;
-      this.page = 1; // 切换标签时重置页面为第一页
-      this.requestUpdate();
+      this.page = 1;
     }
     handlePageChange(page) {
       this.page = page;
-      this.requestUpdate();
     }
     handleFilterChange(event) {
-      clearTimeout(this.filterTimeout);
-      this.filterTimeout = setTimeout(() => {
-        this.filterText = event.target.value;
-        this.filterData();
-        this.page = 1; // 清空分页
-        this.requestUpdate();
-      }, 300); // 延迟 300 毫秒
+      this.filterText = event.target.value;
     }
     render() {
       const itemsPerPage = 5;
@@ -788,12 +854,10 @@
       const startIndex = (this.page - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
       const currentPageDataSlice = currentPageData.slice(startIndex, endIndex);
-      return x(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n      <ha-card class=\"card\">\n        <h1>Contacts</h1>\n\n        <!-- \u8FC7\u6EE4\u8F93\u5165\u6846 -->\n        <div class=\"filter-container\">\n          <input\n            class=\"filter-input\"\n            type=\"text\"\n            .value=\"", "\"\n            @input=\"", "\"\n            placeholder=\"Filter by userName, nickName, or remark\"\n          />\n        </div>\n\n        <!-- Tab \u5207\u6362\u6309\u94AE -->\n        <div class=\"tab-container\">\n          <div\n            class=\"tab ", "\"\n            @click=\"", "\"\n          >\n            Friends\n          </div>\n          <div\n            class=\"tab ", "\"\n            @click=\"", "\"\n          >\n            Chatrooms\n          </div>\n        </div>\n\n        <!-- \u6E32\u67D3\u5F53\u524D\u6807\u7B7E\u7684\u6570\u636E -->\n        <div class=\"data-list\">\n          ", "\n        </div>\n\n        <!-- \u5206\u9875 -->\n        <div class=\"pagination\">\n          ", "\n          <span>Page ", " of ", "</span>\n          ", "\n        </div>\n      </ha-card>\n    "])), this.filterText, this.handleFilterChange, this.currentTab === 'friends' ? 'active' : '', () => this.handleTabChange('friends'), this.currentTab === 'chatrooms' ? 'active' : '', () => this.handleTabChange('chatrooms'), currentPageDataSlice.map(item => x(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n              <div class=\"data-item\">\n                <img\n                  class=\"avatar\"\n                  src=\"", "\"\n                  alt=\"avatar\"\n                />\n                <div><strong>", "</strong></div>\n                <div>", "</div>\n                <div>", "</div>\n              </div>\n            "])), item.smallHeadImgUrl || '/local/default-avatar.png', item.userName, item.nickName, item.remark)), this.page > 1 ? x(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n                <button\n                  class=\"page-button\"\n                  @click=\"", "\"\n                >\n                  Previous\n                </button>\n              "])), () => this.handlePageChange(this.page - 1)) : '', this.page, totalPages, this.page < totalPages ? x(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n                <button\n                  class=\"page-button\"\n                  @click=\"", "\"\n                >\n                  Next\n                </button>\n              "])), () => this.handlePageChange(this.page + 1)) : '');
-    }
-    firstUpdated() {
-      this.fetchData();
+      return x(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n      <ha-card class=\"card\">\n        <h1>Contacts</h1>\n\n        <div class=\"filter-container\">\n          <input\n            class=\"filter-input\"\n            type=\"text\"\n            .value=\"", "\"\n            @input=\"", "\"\n            placeholder=\"Filter by userName, nickName, or remark\"\n          />\n        </div>\n\n        <div>\n          <div class=\"tab ", "\" @click=\"", "\">\n            Friends\n          </div>\n          <div class=\"tab ", "\" @click=\"", "\">\n            Chatrooms\n          </div>\n        </div>\n\n        <div class=\"data-list\">\n          ", "\n        </div>\n\n        <div class=\"pagination\">\n          ", "\n          <span>Page ", " of ", "</span>\n          ", "\n        </div>\n      </ha-card>\n    "])), this.filterText, this.handleFilterChange, this.currentTab === 'friends' ? 'active' : '', () => this.handleTabChange('friends'), this.currentTab === 'chatrooms' ? 'active' : '', () => this.handleTabChange('chatrooms'), currentPageDataSlice.map(item => x(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n            <div class=\"data-item\">\n              <img class=\"avatar\" src=\"", "\" alt=\"avatar\" />\n              <div><strong>", "</strong></div>\n              <div>", "</div>\n              <div>", "</div>\n            </div>\n          "])), item.smallHeadImgUrl || '/local/default-avatar.png', item.userName, item.nickName, item.remark)), this.page > 1 ? x(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n            <button class=\"page-button\" @click=\"", "\">Previous</button>\n          "])), () => this.handlePageChange(this.page - 1)) : '', this.page, totalPages, this.page < totalPages ? x(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n            <button class=\"page-button\" @click=\"", "\">Next</button>\n          "])), () => this.handlePageChange(this.page + 1)) : '');
     }
   }
+  _defineProperty(GeweNotifyCard, "styles", i$3(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n    .card {\n      padding: 16px;\n      background: var(--ha-card-background);\n      border-radius: 8px;\n    }\n\n    .page-button {\n      margin-top: 16px;\n      cursor: pointer;\n      padding: 8px;\n      background-color: var(--primary-color);\n      color: white;\n      border-radius: 4px;\n      font-weight: bold;\n      text-align: center;\n    }\n\n    .tab {\n      display: inline-block;\n      padding: 8px 16px;\n      margin-right: 8px;\n      cursor: pointer;\n      background-color: var(--secondary-background-color);\n      border-radius: 8px;\n    }\n\n    .tab.active {\n      background-color: var(--primary-color);\n      color: white;\n    }\n\n    .data-item {\n      display: flex;\n      align-items: center;\n      margin-bottom: 12px;\n    }\n\n    .avatar {\n      width: 50px;\n      height: 50px;\n      border-radius: 50%;\n      margin-right: 12px;\n\n\n    .pagination {\n      display: flex;\n      justify-content: center;\n      margin-top: 16px;\n    }\n\n    .filter-container {\n      margin-bottom: 16px;\n    }\n\n    .filter-input {\n      padding: 8px;\n      width: 30%;\n      margin-right: 10px;\n      border-radius: 4px;\n      border: 1px solid var(--primary-color);\n    }\n  "]))));
   customElements.define('gewe-notify-card', GeweNotifyCard);
 
 })();
