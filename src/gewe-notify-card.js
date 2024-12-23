@@ -3,71 +3,145 @@ import { HomeAssistant } from 'custom-card-helpers';
 
 class GeweNotifyCard extends LitElement {
   static styles = css`
-    .card {
-      padding: 16px;
-      background: var(--ha-card-background);
-      border-radius: 8px;
+    :host {
+      display: block;
+      font-family: 'Roboto', sans-serif;
+      --primary-color: #6200ea;
+      --secondary-color: #03dac6;
+      --background-color: #f9f9f9;
+      --card-background: #ffffff;
+      --border-radius: 8px;
     }
 
-    .page-button {
-      margin-top: 16px;
-      cursor: pointer;
-      padding: 8px;
-      background-color: var(--primary-color);
-      color: white;
-      border-radius: 4px;
-      font-weight: bold;
-      text-align: center;
+    .card {
+      padding: 16px;
+      background: var(--card-background);
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      font-size: 14px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      color: var(--primary-color);
+    }
+
+    .tab-container {
+      display: flex;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #e0e0e0;
     }
 
     .tab {
-      display: inline-block;
-      padding: 8px 16px;
-      margin-right: 8px;
+      flex: 1;
+      padding: 12px 0;
+      text-align: center;
       cursor: pointer;
-      background-color: var(--secondary-background-color);
-      border-radius: 8px;
+      font-weight: bold;
+      color: #555;
+      transition: background-color 0.3s, color 0.3s;
     }
 
     .tab.active {
       background-color: var(--primary-color);
       color: white;
+      border-bottom: 3px solid white;
+    }
+
+    .filter-container {
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .filter-input {
+      padding: 10px 12px;
+      width: 60%;
+      border-radius: 25px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      box-sizing: border-box;
+      background-color: #f1f1f1;
+      transition: background-color 0.3s;
+    }
+
+    .filter-input:focus {
+      background-color: #ffffff;
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .data-list {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
     }
 
     .data-item {
       display: flex;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+      padding: 12px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .data-item:hover {
+      background-color: #f1f1f1;
+      transform: translateX(5px);
     }
 
     .avatar {
       width: 50px;
       height: 50px;
       border-radius: 50%;
-      margin-right: 12px;
-
+      margin-right: 16px;
+      object-fit: cover;
+    }
 
     .column-name {
       font-weight: bold;
-      margin-right: 12px;
+      color: #666;
+      margin-right: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .pagination {
       display: flex;
       justify-content: center;
-      margin-top: 16px;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
     }
 
-    .filter-container {
-      margin-bottom: 16px;
+    .page-button {
+      padding: 8px 16px;
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 500;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background-color 0.3s;
     }
 
-    .filter-input {
-      padding: 8px;
-      width: 30%;
-      margin-right: 10px;
-      border-radius: 4px;
-      border: 1px solid var(--primary-color);
+    .page-button:hover {
+      background-color: var(--secondary-color);
+    }
+
+    .page-button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .pagination span {
+      color: #888;
     }
   `;
 
@@ -194,7 +268,7 @@ class GeweNotifyCard extends LitElement {
           />
         </div>
 
-        <div>
+        <div class="tab-container">
           <div class="tab ${this.currentTab === 'friends' ? 'active' : ''}" @click="${() => this.handleTabChange('friends')}">
             Friends
           </div>
@@ -234,3 +308,4 @@ class GeweNotifyCard extends LitElement {
 }
 
 customElements.define('gewe-notify-card', GeweNotifyCard);
+
