@@ -69,7 +69,7 @@ class GeweNotifyCard extends LitElement {
   static get properties() {
     return {
       hass: { type: Object },
-      config: { type: Object },
+      _config: { type: Object },
       currentTab: { type: String },
       page: { type: Number },
       friends: { type: Array },
@@ -92,15 +92,11 @@ class GeweNotifyCard extends LitElement {
     this.filterText = '';
     this.filterTimeout = null;
     this.hass = {};
-    this.config = {};
+    this._config = {};
   }
 
   setConfig(config) {
-    if (!config || !config.hass) {
-      throw new Error('Invalid configuration');
-    }
-    this.config = config;
-    this.hass = config.hass;
+    this._config = config;
   }
 
   updated(changedProperties) {
@@ -162,6 +158,11 @@ class GeweNotifyCard extends LitElement {
   }
 
   render() {
+    if (!this.hass || !this._config) {
+      return html``;
+      console.log("hass or _config error!")
+    }
+
     const itemsPerPage = 5;
     const currentPageData =
       this.currentTab === 'friends' ? this.filteredFriends : this.filteredChatrooms;

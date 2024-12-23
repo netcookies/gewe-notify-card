@@ -754,14 +754,14 @@
   });
   ((_globalThis$litElemen2 = globalThis.litElementVersions) !== null && _globalThis$litElemen2 !== void 0 ? _globalThis$litElemen2 : globalThis.litElementVersions = []).push("4.1.1");
 
-  var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5;
+  var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5, _templateObject6;
   class GeweNotifyCard extends r {
     static get properties() {
       return {
         hass: {
           type: Object
         },
-        config: {
+        _config: {
           type: Object
         },
         currentTab: {
@@ -801,14 +801,10 @@
       this.filterText = '';
       this.filterTimeout = null;
       this.hass = {};
-      this.config = {};
+      this._config = {};
     }
     setConfig(config) {
-      if (!config || !config.hass) {
-        throw new Error('Invalid configuration');
-      }
-      this.config = config;
-      this.hass = config.hass;
+      this._config = config;
     }
     updated(changedProperties) {
       if (changedProperties.has('hass')) {
@@ -848,16 +844,19 @@
       this.filterText = event.target.value;
     }
     render() {
+      if (!this.hass || !this._config) {
+        return x(_templateObject || (_templateObject = _taggedTemplateLiteral([""])));
+      }
       const itemsPerPage = 5;
       const currentPageData = this.currentTab === 'friends' ? this.filteredFriends : this.filteredChatrooms;
       const totalPages = Math.ceil(currentPageData.length / itemsPerPage);
       const startIndex = (this.page - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
       const currentPageDataSlice = currentPageData.slice(startIndex, endIndex);
-      return x(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n      <ha-card class=\"card\">\n        <h1>Contacts</h1>\n\n        <div class=\"filter-container\">\n          <input\n            class=\"filter-input\"\n            type=\"text\"\n            .value=\"", "\"\n            @input=\"", "\"\n            placeholder=\"Filter by userName, nickName, or remark\"\n          />\n        </div>\n\n        <div>\n          <div class=\"tab ", "\" @click=\"", "\">\n            Friends\n          </div>\n          <div class=\"tab ", "\" @click=\"", "\">\n            Chatrooms\n          </div>\n        </div>\n\n        <div class=\"data-list\">\n          ", "\n        </div>\n\n        <div class=\"pagination\">\n          ", "\n          <span>Page ", " of ", "</span>\n          ", "\n        </div>\n      </ha-card>\n    "])), this.filterText, this.handleFilterChange, this.currentTab === 'friends' ? 'active' : '', () => this.handleTabChange('friends'), this.currentTab === 'chatrooms' ? 'active' : '', () => this.handleTabChange('chatrooms'), currentPageDataSlice.map(item => x(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n            <div class=\"data-item\">\n              <img class=\"avatar\" src=\"", "\" alt=\"avatar\" />\n              <div><strong>", "</strong></div>\n              <div>", "</div>\n              <div>", "</div>\n            </div>\n          "])), item.smallHeadImgUrl || '/local/default-avatar.png', item.userName, item.nickName, item.remark)), this.page > 1 ? x(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n            <button class=\"page-button\" @click=\"", "\">Previous</button>\n          "])), () => this.handlePageChange(this.page - 1)) : '', this.page, totalPages, this.page < totalPages ? x(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n            <button class=\"page-button\" @click=\"", "\">Next</button>\n          "])), () => this.handlePageChange(this.page + 1)) : '');
+      return x(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n      <ha-card class=\"card\">\n        <h1>Contacts</h1>\n\n        <div class=\"filter-container\">\n          <input\n            class=\"filter-input\"\n            type=\"text\"\n            .value=\"", "\"\n            @input=\"", "\"\n            placeholder=\"Filter by userName, nickName, or remark\"\n          />\n        </div>\n\n        <div>\n          <div class=\"tab ", "\" @click=\"", "\">\n            Friends\n          </div>\n          <div class=\"tab ", "\" @click=\"", "\">\n            Chatrooms\n          </div>\n        </div>\n\n        <div class=\"data-list\">\n          ", "\n        </div>\n\n        <div class=\"pagination\">\n          ", "\n          <span>Page ", " of ", "</span>\n          ", "\n        </div>\n      </ha-card>\n    "])), this.filterText, this.handleFilterChange, this.currentTab === 'friends' ? 'active' : '', () => this.handleTabChange('friends'), this.currentTab === 'chatrooms' ? 'active' : '', () => this.handleTabChange('chatrooms'), currentPageDataSlice.map(item => x(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n            <div class=\"data-item\">\n              <img class=\"avatar\" src=\"", "\" alt=\"avatar\" />\n              <div><strong>", "</strong></div>\n              <div>", "</div>\n              <div>", "</div>\n            </div>\n          "])), item.smallHeadImgUrl || '/local/default-avatar.png', item.userName, item.nickName, item.remark)), this.page > 1 ? x(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n            <button class=\"page-button\" @click=\"", "\">Previous</button>\n          "])), () => this.handlePageChange(this.page - 1)) : '', this.page, totalPages, this.page < totalPages ? x(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n            <button class=\"page-button\" @click=\"", "\">Next</button>\n          "])), () => this.handlePageChange(this.page + 1)) : '');
     }
   }
-  _defineProperty(GeweNotifyCard, "styles", i$3(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n    .card {\n      padding: 16px;\n      background: var(--ha-card-background);\n      border-radius: 8px;\n    }\n\n    .page-button {\n      margin-top: 16px;\n      cursor: pointer;\n      padding: 8px;\n      background-color: var(--primary-color);\n      color: white;\n      border-radius: 4px;\n      font-weight: bold;\n      text-align: center;\n    }\n\n    .tab {\n      display: inline-block;\n      padding: 8px 16px;\n      margin-right: 8px;\n      cursor: pointer;\n      background-color: var(--secondary-background-color);\n      border-radius: 8px;\n    }\n\n    .tab.active {\n      background-color: var(--primary-color);\n      color: white;\n    }\n\n    .data-item {\n      display: flex;\n      align-items: center;\n      margin-bottom: 12px;\n    }\n\n    .avatar {\n      width: 50px;\n      height: 50px;\n      border-radius: 50%;\n      margin-right: 12px;\n\n\n    .pagination {\n      display: flex;\n      justify-content: center;\n      margin-top: 16px;\n    }\n\n    .filter-container {\n      margin-bottom: 16px;\n    }\n\n    .filter-input {\n      padding: 8px;\n      width: 30%;\n      margin-right: 10px;\n      border-radius: 4px;\n      border: 1px solid var(--primary-color);\n    }\n  "]))));
+  _defineProperty(GeweNotifyCard, "styles", i$3(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral(["\n    .card {\n      padding: 16px;\n      background: var(--ha-card-background);\n      border-radius: 8px;\n    }\n\n    .page-button {\n      margin-top: 16px;\n      cursor: pointer;\n      padding: 8px;\n      background-color: var(--primary-color);\n      color: white;\n      border-radius: 4px;\n      font-weight: bold;\n      text-align: center;\n    }\n\n    .tab {\n      display: inline-block;\n      padding: 8px 16px;\n      margin-right: 8px;\n      cursor: pointer;\n      background-color: var(--secondary-background-color);\n      border-radius: 8px;\n    }\n\n    .tab.active {\n      background-color: var(--primary-color);\n      color: white;\n    }\n\n    .data-item {\n      display: flex;\n      align-items: center;\n      margin-bottom: 12px;\n    }\n\n    .avatar {\n      width: 50px;\n      height: 50px;\n      border-radius: 50%;\n      margin-right: 12px;\n\n\n    .pagination {\n      display: flex;\n      justify-content: center;\n      margin-top: 16px;\n    }\n\n    .filter-container {\n      margin-bottom: 16px;\n    }\n\n    .filter-input {\n      padding: 8px;\n      width: 30%;\n      margin-right: 10px;\n      border-radius: 4px;\n      border: 1px solid var(--primary-color);\n    }\n  "]))));
   customElements.define('gewe-notify-card', GeweNotifyCard);
 
 })();
