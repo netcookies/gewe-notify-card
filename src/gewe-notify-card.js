@@ -47,6 +47,11 @@ class GeweNotifyCard extends LitElement {
       margin-right: 12px;
 
 
+    .column-name {
+      font-weight: bold;
+      margin-right: 12px;
+    }
+
     .pagination {
       display: flex;
       justify-content: center;
@@ -161,7 +166,6 @@ class GeweNotifyCard extends LitElement {
   render() {
     if (!this.hass || !this._config) {
       return html``;
-      console.log("hass or _config error!")
     }
 
     const itemsPerPage = 5;
@@ -172,6 +176,9 @@ class GeweNotifyCard extends LitElement {
     const startIndex = (this.page - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const currentPageDataSlice = currentPageData.slice(startIndex, endIndex);
+
+    // 列名数组，与数据项数组对应
+    const columnNames = ['Avatar', 'Username', 'Nickname', 'Remark'];
 
     return html`
       <ha-card class="card">
@@ -197,10 +204,15 @@ class GeweNotifyCard extends LitElement {
         </div>
 
         <div class="data-list">
+          <div class="data-item">
+            ${columnNames.map(column => html`
+              <div class="column-name">${column}</div>
+            `)}
+          </div>
           ${currentPageDataSlice.map(item => html`
             <div class="data-item">
               <img class="avatar" src="${item.smallHeadImgUrl || '/local/default-avatar.png'}" alt="avatar" />
-              <div><strong>${item.userName}</strong></div>
+              <div>${item.userName}</div>
               <div>${item.nickName}</div>
               <div>${item.remark}</div>
             </div>

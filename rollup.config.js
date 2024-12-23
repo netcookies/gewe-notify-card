@@ -1,13 +1,14 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import babel from '@rollup/plugin-babel';
+import copy from 'rollup-plugin-copy'; // 引入 rollup-plugin-copy 插件
 
 export default {
-  input: 'src/gewe-notify-card.js', // 源代码路径
+  input: 'src/gewe-notify-card.js',
   output: {
-    file: 'dist/gewe-notify-card.js', // 输出路径
-    format: 'iife', // 兼容性更强的格式
-    name: 'GeweNotifyCard', // 全局变量名
+    file: 'dist/gewe-notify-card.js',
+    format: 'iife',
+    name: 'GeweNotifyCard',
   },
   plugins: [
     resolve(),
@@ -22,6 +23,12 @@ export default {
         ["@babel/plugin-proposal-class-properties", { "loose": true }]
       ],
     }),
+    // 添加 rollup-plugin-copy 配置
+    copy({
+      targets: [
+        { src: 'src/images/*', dest: 'dist/images' } // 将 src/images 下的所有文件复制到 dist/images 目录
+      ]
+    })
   ],
 };
 
