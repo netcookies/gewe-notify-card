@@ -36,7 +36,6 @@ git clone https://github.com/netcookies/gewe-notify-card.git
 
 ```yaml
 type: custom:gewe-notify-card
-title: 联系人
 ```
 
 ### 步骤 3: 重新加载 Lovelace
@@ -62,7 +61,7 @@ type: custom:gewe-notify-card
 
 下面是 `GeWe Notify Card` 在 Home Assistant 中的实际展示：
 
-![GeWe Notify Card](readme.PNG)
+![GeWe Notify Card](readme.PNG?raw=true)
 
 ## 故障排除
 
