@@ -74,51 +74,30 @@ class GeweNotifyCard extends LitElement {
       border-color: var(--primary-color);
     }
 
-    .data-list {
-      margin-bottom: 20px;
-      display: flex;
-      flex-direction: column;
+    table {
+      width: 100%;
+      border-collapse: collapse;
     }
 
-    .data-item {
-      display: flex;
-      align-items: center;
-      margin-bottom: 16px;
+    th, td {
       padding: 12px;
-      background-color: #f9f9f9;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      transition: background-color 0.3s, transform 0.3s;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
     }
 
-    .data-item:hover {
-      background-color: #f1f1f1;
-      transform: translateX(5px);
-    }
-
-    .data-item > div {
-      flex: 1;
-      padding-right: 20px;
-    }
-
-    .data-item > div:not(:last-child) {
-      margin-right: 20px;
-    }
-
-    .avatar {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      margin-right: 16px;
-      object-fit: cover;
-    }
-
-    .column-name {
-      font-weight: bold;
-      color: #666;
-      margin-right: 20px;
+    th {
+      background-color: var(--primary-color);
+      color: white;
       text-transform: uppercase;
       letter-spacing: 1px;
+    }
+
+    td {
+      background-color: #f9f9f9;
+    }
+
+    td:hover {
+      background-color: #f1f1f1;
     }
 
     .pagination {
@@ -286,21 +265,23 @@ class GeweNotifyCard extends LitElement {
           </div>
         </div>
 
-        <div class="data-list">
-          <div class="data-item">
-            ${columnNames.map(column => html`
-              <div class="column-name">${column}</div>
+        <table>
+          <thead>
+            <tr>
+              ${columnNames.map(column => html`<th>${column}</th>`)}
+            </tr>
+          </thead>
+          <tbody>
+            ${currentPageDataSlice.map(item => html`
+              <tr>
+                <td><img class="avatar" src="${item.smallHeadImgUrl || '/hacsfiles/gewe-notify-card/images/default-avatar.png'}" alt="avatar" /></td>
+                <td>${item.userName}</td>
+                <td>${item.nickName}</td>
+                <td>${item.remark}</td>
+              </tr>
             `)}
-          </div>
-          ${currentPageDataSlice.map(item => html`
-            <div class="data-item">
-              <img class="avatar" src="${item.smallHeadImgUrl || '/local/gewe-notify-card/images/default-avatar.png'}" alt="avatar" />
-              <div>${item.userName}</div>
-              <div>${item.nickName}</div>
-              <div>${item.remark}</div>
-            </div>
-          `)}
-        </div>
+          </tbody>
+        </table>
 
         <div class="pagination">
           ${this.page > 1 ? html`
@@ -317,4 +298,3 @@ class GeweNotifyCard extends LitElement {
 }
 
 customElements.define('gewe-notify-card', GeweNotifyCard);
-
