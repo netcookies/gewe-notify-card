@@ -117,6 +117,7 @@ class GeweNotifyCard extends LitElement {
 
     this.hass.callApi('GET', 'gewe_contacts')
       .then(result => {
+        console.log('API call result:', result);
         this.friends = result.attributes.friends || [];
         this.chatrooms = result.attributes.chatrooms || [];
         this.filterData();
