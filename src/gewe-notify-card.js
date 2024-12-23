@@ -74,6 +74,14 @@ class GeweNotifyCard extends LitElement {
       border-color: var(--primary-color);
     }
 
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 16px;
+      object-fit: cover;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -231,10 +239,13 @@ class GeweNotifyCard extends LitElement {
     this.filterText = event.target.value;
   }
 
-  // 点击用户名的事件处理函数
-  handleUsernameClick(userName) {
-    alert(`You clicked on ${userName}'s profile!`);
-    // 这里可以执行任何你想要的操作，例如显示详细信息，跳转到其他页面等。
+  async handleUsernameClick(userName) {
+    try {
+      await navigator.clipboard.writeText(userName);
+      alert(`${userName} has been copied to the clipboard!`);
+    } catch (error) {
+      console.error('Failed to copy username to clipboard:', error);
+    }
   }
 
   render() {
