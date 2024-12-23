@@ -74,14 +74,6 @@ class GeweNotifyCard extends LitElement {
       border-color: var(--primary-color);
     }
 
-    .avatar {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      margin-right: 16px;
-      object-fit: cover;
-    }
-
     table {
       width: 100%;
       border-collapse: collapse;
@@ -106,6 +98,12 @@ class GeweNotifyCard extends LitElement {
 
     td:hover {
       background-color: #f1f1f1;
+    }
+
+    .clickable {
+      cursor: pointer;
+      color: var(--primary-color);
+      text-decoration: underline;
     }
 
     .pagination {
@@ -233,6 +231,12 @@ class GeweNotifyCard extends LitElement {
     this.filterText = event.target.value;
   }
 
+  // 点击用户名的事件处理函数
+  handleUsernameClick(userName) {
+    alert(`You clicked on ${userName}'s profile!`);
+    // 这里可以执行任何你想要的操作，例如显示详细信息，跳转到其他页面等。
+  }
+
   render() {
     if (!this.hass || !this._config) {
       return html``;
@@ -283,7 +287,7 @@ class GeweNotifyCard extends LitElement {
             ${currentPageDataSlice.map(item => html`
               <tr>
                 <td><img class="avatar" src="${item.smallHeadImgUrl || '/hacsfiles/gewe-notify-card/images/default-avatar.png'}" alt="avatar" /></td>
-                <td>${item.userName}</td>
+                <td @click="${() => this.handleUsernameClick(item.userName)}" class="clickable">${item.userName}</td>
                 <td>${item.nickName}</td>
                 <td>${item.remark}</td>
               </tr>
@@ -306,3 +310,4 @@ class GeweNotifyCard extends LitElement {
 }
 
 customElements.define('gewe-notify-card', GeweNotifyCard);
+
