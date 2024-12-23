@@ -74,6 +74,14 @@ class GeweNotifyCard extends LitElement {
       border-color: var(--primary-color);
     }
 
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 16px;
+      object-fit: cover;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
