@@ -239,13 +239,9 @@ class GeweNotifyCard extends LitElement {
     this.filterText = event.target.value;
   }
 
-  async handleUsernameClick(userName) {
-    try {
-      await navigator.clipboard.writeText(userName);
-      alert(`${userName} has been copied to the clipboard!`);
-    } catch (error) {
-      console.error('Failed to copy username to clipboard:', error);
-    }
+  // 点击用户名的事件处理函数
+  handleUsernameClick(userName) {
+    alert(`复制这个>>${userName}<<贴到notify.gewe_notify!`);
   }
 
   render() {

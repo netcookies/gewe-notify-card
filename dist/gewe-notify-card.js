@@ -844,13 +844,10 @@
     handleFilterChange(event) {
       this.filterText = event.target.value;
     }
-    async handleUsernameClick(userName) {
-      try {
-        await navigator.clipboard.writeText(userName);
-        alert("".concat(userName, " has been copied to the clipboard!"));
-      } catch (error) {
-        console.error('Failed to copy username to clipboard:', error);
-      }
+
+    // 点击用户名的事件处理函数
+    handleUsernameClick(userName) {
+      alert("\u590D\u5236\u8FD9\u4E2A>>".concat(userName, "<<\u8D34\u5230notify.gewe_notify!"));
     }
     render() {
       if (!this.hass || !this._config) {
