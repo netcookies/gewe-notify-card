@@ -61,17 +61,9 @@ type: custom:gewe-notify-card
 
 下面是 `GeWe Notify Card` 在 Home Assistant 中的实际展示：
 
-![GeWe Notify Card](readme.PNG?raw=true)
+![GeWe Notify Card](README.png)
 
 ## 故障排除
-
-### 剪贴板 API 无法工作？
-
-请确保您的 **Home Assistant** 实例是通过 **HTTPS** 或 **localhost** 运行的。`navigator.clipboard` API 仅在安全上下文中可用。
-
-### 权限问题
-
-某些浏览器可能需要额外的权限才能访问剪贴板。确保您已批准任何权限请求。
 
 ## 贡献
 
